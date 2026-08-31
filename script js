@@ -1,14 +1,38 @@
-// LÓGICA DA LUPA DE LEITURA
+// CONTROLE DE NAVEGAÇÃO POR ABAS
+function abrirAba(evento, idAba) {
+  const conteudos = document.querySelectorAll('.aba-conteudo');
+  conteudos.forEach(conteudo => conteudo.classList.remove('ativa'));
+
+  const botoes = document.querySelectorAll('.aba-btn');
+  botoes.forEach(botao => botao.classList.remove('ativa'));
+
+  document.getElementById(idAba).classList.add('ativa');
+  evento.currentTarget.classList.add('ativa');
+}
+
+// CONTROLE DAS SUB-ABAS DE GOLPES
+function abrirSubAba(evento, idSubAba) {
+  const conteudos = document.querySelectorAll('.sub-aba-conteudo');
+  conteudos.forEach(conteudo => conteudo.classList.remove('ativa'));
+
+  const botoes = document.querySelectorAll('.sub-aba-btn');
+  botoes.forEach(botao => botao.classList.remove('ativa'));
+
+  document.getElementById(idSubAba).classList.add('ativa');
+  evento.currentTarget.classList.add('ativa');
+}
+
+// LÓGICA DA LUPA (AMPLIAR E VOLTAR AO NORMAL)
+let tamanhoAtual = 32; // Tamanho base
+const tamanhoPadrao = 32;
+const tamanhoMaximo = 64;
+
 const textoLupa = document.getElementById('textoLupa');
-const sliderTamanho = document.getElementById('sliderTamanho');
 const resultadoLupa = document.getElementById('resultadoLupa');
 
-// Atualiza o texto e o tamanho da fonte em tempo real
 function atualizarLupa() {
   const texto = textoLupa.value.trim();
-  const tamanho = sliderTamanho.value;
-
-  resultadoLupa.style.fontSize = `${tamanho}px`;
+  resultadoLupa.style.fontSize = `${tamanhoAtual}px`;
 
   if (texto !== "") {
     resultadoLupa.textContent = texto;
@@ -17,11 +41,22 @@ function atualizarLupa() {
   }
 }
 
+function ampliarTexto() {
+  if (tamanhoAtual < tamanhoMaximo) {
+    tamanhoAtual += 6;
+    atualizarLupa();
+  }
+}
+
+function restaurarTexto() {
+  tamanhoAtual = tamanhoPadrao;
+  atualizarLupa();
+}
+
 textoLupa.addEventListener('input', atualizarLupa);
-sliderTamanho.addEventListener('input', atualizarLupa);
 
 
-// LÓGICA DO DETECTOR DE GOLPES
+// LÓGICA DO VERIFICADOR DE GOLPES
 function verificarGolpe() {
   const mensagem = document.getElementById('textoGolpe').value.toLowerCase().trim();
   const resultadoDiv = document.getElementById('resultadoGolpe');
@@ -31,7 +66,6 @@ function verificarGolpe() {
     return;
   }
 
-  // Lista de palavras e expressões comuns em golpes
   const palavrasSuspeitas = [
     "pix", "urgente", "bloqueado", "bloqueio", "senha", "banco", 
     "transferência", "premio", "prêmio", "sorteio", "clique no link", 
@@ -39,7 +73,6 @@ function verificarGolpe() {
     "mãe", "pai", "preciso de dinheiro", "número novo"
   ];
 
-  // Encontra quais palavras suspeitas aparecem na mensagem
   const encontradas = palavrasSuspeitas.filter(palavra => mensagem.includes(palavra));
 
   resultadoDiv.classList.remove('hidden');
@@ -50,18 +83,18 @@ function verificarGolpe() {
       <h3>⚠️ ATENÇÃO: ESTA MENSAGEM PODE SER UM GOLPE!</h3>
       <p><strong>Termos suspeitos identificados:</strong> ${encontradas.join(', ')}.</p>
       <br>
-      <p>💡 <strong>Dicas importantes:</strong></p>
+      <p>💡 <strong>Dicas de proteção:</strong></p>
       <ul>
-        <li>Não envie dinheiro ou PIX.</li>
-        <li>Não clique em links anexados.</li>
-        <li>Ligue diretamente para a pessoa ou banco para confirmar.</li>
+        <li>Não faça PIX nem envie dinheiro.</li>
+        <li>Não clique em links.</li>
+        <li>Ligue para o parente ou banco no número antigo/oficial.</li>
       </ul>
     `;
   } else {
     resultadoDiv.className = "caixa-resposta alerta-seguro";
     resultadoDiv.innerHTML = `
       <h3>✅ Nenhum termo suspeito comum foi encontrado.</h3>
-      <p>Mesmo assim, fique atento: nunca envie senhas, códigos de confirmação ou dados pessoais a ninguém!</p>
+      <p>Mesmo assim, lembre-se: bancos e parentes não pedem senhas ou códigos por mensagem!</p>
     `;
   }
 }
