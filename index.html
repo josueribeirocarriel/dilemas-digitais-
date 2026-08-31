@@ -13,34 +13,91 @@
     <p>Seu espaço seguro para ler com facilidade e evitar golpes.</p>
   </header>
 
+  <!-- NAVEGAÇÃO POR ABAS -->
+  <nav class="navegacao-abas" aria-label="Navegação principal">
+    <button class="aba-btn ativa" onclick="abrirAba(event, 'aba-lupa')">🔍 Lupa de Leitura</button>
+    <button class="aba-btn" onclick="abrirAba(event, 'aba-verificador')">🛡️ Verificador</button>
+    <button class="aba-btn" onclick="abrirAba(event, 'aba-golpes')">📚 Como Funcionam os Golpes</button>
+  </nav>
+
   <main class="conteudo-principal">
 
-    <!-- SEÇÃO 1: LUPA DE TEXTO -->
-    <section class="cartao">
-      <h2>🔍 Lupa de Leitura</h2>
-      <label for="textoLupa">Cole ou digite seu texto abaixo:</label>
-      <textarea id="textoLupa" rows="4" placeholder="Cole a mensagem ou texto aqui..."></textarea>
-      
-      <div class="controle-tamanho">
-        <label for="sliderTamanho">Tamanho da letra:</label>
-        <input type="range" id="sliderTamanho" min="24" max="60" value="36">
-      </div>
+    <!-- ABA 1: LUPA DE LEITURA -->
+    <section id="aba-lupa" class="aba-conteudo ativa">
+      <div class="cartao">
+        <h2>🔍 Lupa de Leitura Interativa</h2>
+        <label for="textoLupa">Cole ou digite seu texto abaixo:</label>
+        <textarea id="textoLupa" rows="4" placeholder="Cole a mensagem ou texto aqui..."></textarea>
+        
+        <div class="controles-lupa">
+          <button type="button" class="btn-controle" onclick="ampliarTexto()">➕ Aumentar Letra</button>
+          <button type="button" class="btn-controle btn-secundario" onclick="restaurarTexto()">🔄 Tamanho Normal</button>
+        </div>
 
-      <div class="caixa-resposta">
-        <h3>Resultado Ampliado:</h3>
-        <div id="resultadoLupa" class="texto-ampliado">O texto ampliado aparecerá aqui.</div>
+        <div class="caixa-resposta">
+          <h3>Resultado da Leitura:</h3>
+          <div id="resultadoLupa" class="texto-ampliado">O texto ampliado aparecerá aqui.</div>
+        </div>
       </div>
     </section>
 
-    <!-- SEÇÃO 2: DETECTOR DE GOLPES -->
-    <section class="cartao">
-      <h2>🛡️ Verificador de Golpes</h2>
-      <label for="textoGolpe">Recebeu uma mensagem estranha? Cole aqui:</label>
-      <textarea id="textoGolpe" rows="4" placeholder="Exemplo: Preciso de um PIX urgente..."></textarea>
-      
-      <button onclick="verificarGolpe()" class="botao-principal">ANALISAR MENSAGEM</button>
+    <!-- ABA 2: VERIFICADOR DE MENSAGENS -->
+    <section id="aba-verificador" class="aba-conteudo">
+      <div class="cartao">
+        <h2>🛡️ Verificador de Mensagens Suspeitas</h2>
+        <label for="textoGolpe">Recebeu uma mensagem estranha? Cole aqui:</label>
+        <textarea id="textoGolpe" rows="4" placeholder="Exemplo: Preciso de um PIX urgente..."></textarea>
+        
+        <button type="button" onclick="verificarGolpe()" class="botao-acao">ANALISAR MENSAGEM</button>
 
-      <div id="resultadoGolpe" class="caixa-resposta hidden"></div>
+        <div id="resultadoGolpe" class="caixa-resposta hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ABA 3: EDUCATIVA SOBRE GOLPES -->
+    <section id="aba-golpes" class="aba-conteudo">
+      <div class="cartao">
+        <h2>📚 Guia de Prevenção Contra Golpes</h2>
+        <p class="instrucao-aba">Escolha um tipo de golpe abaixo para entender como ele funciona:</p>
+
+        <div class="sub-navegacao">
+          <button class="sub-aba-btn ativa" onclick="abrirSubAba(event, 'golpe-whatsapp')">📱 Golpes pelo WhatsApp</button>
+          <button class="sub-aba-btn" onclick="abrirSubAba(event, 'golpe-ligacao')">📞 Golpes por Ligação</button>
+        </div>
+
+        <!-- SUB-ABA WHATSAPP -->
+        <article id="golpe-whatsapp" class="sub-aba-conteudo ativa">
+          <h3>📱 Como ocorrem os golpes pelo WhatsApp:</h3>
+          <ul class="lista-explicativa">
+            <li>
+              <strong>Falso Parente:</strong> O criminoso usa a foto de um parente (filho, neto) com um número novo e diz que mudou de telefone. Em seguida, pede dinheiro urgente para pagar uma conta ou fazer um PIX.
+            </li>
+            <li>
+              <strong>Código de Confirmação:</strong> Alguém liga ou manda mensagem fingindo ser de um site de vendas, hotel ou órgão público e pede para você falar um "código de 6 dígitos" enviado por SMS. Esse código serve para roubar o seu WhatsApp.
+            </li>
+            <li>
+              <strong>Links Falsos:</strong> Mensagens prometendo prêmios, cestas básicas, recadastramento de banco ou promoções. Ao clicar no link, eles tentam roubar suas senhas.
+            </li>
+          </ul>
+        </article>
+
+        <!-- SUB-ABA LIGAÇÃO -->
+        <article id="golpe-ligacao" class="sub-aba-conteudo">
+          <h3>📞 Como ocorrem os golpes por Ligação Telefônica:</h3>
+          <ul class="lista-explicativa">
+            <li>
+              <strong>Falsa Central do Banco:</strong> Uma pessoa liga dizendo ser do seu banco e afirma que houve uma compra suspeita no seu cartão. Ela pede para você confirmar senhas, digitar dados ou fazer transferências para "cancelar" a transação.
+            </li>
+            <li>
+              <strong>Golpe do Falso Sequestro:</strong> O golpista liga chorando ou gritando, fingindo ser um familiar em perigo, e exige dinheiro imediato para liberar a pessoa.
+            </li>
+            <li>
+              <strong>Motoboy do Banco:</strong> A pessoa liga dizendo que seu cartão foi clonado e informa que um "entregador" vai até sua casa buscar o cartão cortado. Mesmo cortado, o chip continua funcionando para dar golpes.
+            </li>
+          </ul>
+        </article>
+
+      </div>
     </section>
 
   </main>
