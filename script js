@@ -1,112 +1,373 @@
-// CONTROLE DE NAVEGAÇÃO
-function mudarAba(evento, idAba) {
-  document.querySelectorAll('.aba-conteudo').forEach(aba => aba.classList.remove('ativa'));
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativa'));
+/**
+ * ProtegeIdoso — script.js
+ * Acessibilidade, lupa, voz, verificador de golpes
+ */
 
-  document.getElementById(idAba).classList.add('ativa');
-  evento.currentTarget.classList.add('ativa');
-}
+(function () {
+  'use strict';
 
-// LÚPA E CONTROLE DE FONTE
-let tamanhoFonte = 32;
-const textoEntrada = document.getElementById('textoEntrada');
-const textoAmpliado = document.getElementById('textoAmpliado');
+  // ---------- Estado ----------
+  let fontScale = 1;
+  const FONT_MIN = 0.8;
+  const FONT_MAX = 2.2;
+  const FONT_STEP = 0.15;
+  let utterance = null;
+  let isSpeaking = false;
 
-function atualizarDisplay() {
-  const texto = textoEntrada.value.trim();
-  textoAmpliado.style.fontSize = `${tamanhoFonte}px`;
-  textoAmpliado.textContent = texto !== "" ? texto : "O seu texto aparecerá aqui...";
-}
-
-function alterarTamanho(variacao) {
-  if (tamanhoFonte + variacao >= 20 && tamanhoFonte + variacao <= 72) {
-    tamanhoFonte += variacao;
-    atualizarDisplay();
-  }
-}
-
-textoEntrada.addEventListener('input', atualizarDisplay);
-
-// LEITURA POR VOZ (SÍNTESE DE VOZ DA WEB)
-function ouvirTexto() {
-  const texto = textoEntrada.value.trim();
-  if (texto === "") {
-    alert("Digite um texto antes de clicar em ouvir.");
-    return;
-  }
-
-  window.speechSynthesis.cancel(); // Para leituras anteriores
-  const mensagem = new SpeechSynthesisUtterance(texto);
-  mensagem.lang = 'pt-BR';
-  mensagem.rate = 0.9; // Velocidade levemente reduzida para idosos
-  window.speechSynthesis.speak(mensagem);
-}
-
-function pararVoz() {
-  window.speechSynthesis.cancel();
-}
-
-// VERIFICADOR DE GOLPES
-function analisarGolpe() {
-  const mensagem = document.getElementById('textoAnalisar').value.toLowerCase().trim();
-  const painel = document.getElementById('painelResultado');
-
-  if (mensagem === "") {
-    alert("Por favor, digite ou cole a mensagem para analisar.");
-    return;
-  }
-
-  const palavrasSuspeitas = [
-    "pix", "urgente", "bloqueado", "bloqueio", "senha", "banco", 
-    "transferência", "premio", "prêmio", "sorteio", "clique no link", 
-    "recadastramento", "atualize", "código", "verificação", "filho", 
-    "mãe", "pai", "preciso de dinheiro", "número novo"
+  // Palavras-chave de risco (golpes comuns no BR)
+  const PALAVRAS_RISCO = [
+    'pix', 'urgente', 'bloqueado', 'bloqueada', 'código', 'codigo',
+    'filho', 'filha', 'neto', 'neta', 'mãe', 'mae', 'pai',
+    'número novo', 'numero novo', 'troquei de número', 'troquei de numero',
+    'perdi o celular', 'perdi meu celular', 'novo chip',
+    'token', 'senha', 'cartão', 'cartao', 'transferência', 'transferencia',
+    'resgate', 'sequestro', 'polícia', 'policia', 'central',
+    'desbloquear', 'desbloqueio', 'suspensa', 'suspenso',
+    'confirme seus dados', 'atualize seus dados', 'clique no link',
+    'link', 'app de suporte', 'anydesk', 'teamviewer',
+    'motoboy', 'buscar o cartão', 'buscar o cartao',
+    'não conte', 'nao conte', 'segredo', 'rápido', 'rapido'
   ];
 
-  const encontradas = palavrasSuspeitas.filter(palavra => mensagem.includes(palavra));
-  painel.classList.remove('hidden');
+  // ---------- Elementos ----------
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
 
-  if (encontradas.length > 0) {
-    painel.className = "resultado-analise alerta-perigo";
-    painel.innerHTML = `
-      <h3>⚠️ ATENÇÃO: POSSÍVEL GOLPE DETECTADO!</h3>
-      <p>Termos de risco identificados: <strong>${encontradas.join(', ')}</strong></p>
-      <br>
-      <p><strong>Orientação:</strong> Não faça pagamentos nem envie dados. Ligue diretamente para a pessoa ou instituição para confirmar.</p>
-    `;
-  } else {
-    painel.className = "resultado-analise alerta-seguro";
-    painel.innerHTML = `
-      <h3>✅ Nenhum termo suspeito evidente foi encontrado.</h3>
-      <p>Mantenha a atenção: nunca compartilhe senhas ou códigos recebidos por SMS.</p>
-    `;
+  // Abas
+  const tabs = $$('.tab');
+  const panels = $$('.tab-panel');
+
+  // Lupa
+  const textoLupa = $('#texto-lupa');
+  const displayTexto = $('#display-texto');
+  const btnZoomIn = $('#btn-zoom-in');
+  const btnZoomOut = $('#btn-zoom-out');
+  const zoomLevel = $('#zoom-level');
+  const btnOuvir = $('#btn-ouvir');
+  const btnParar = $('#btn-parar');
+
+  // Verificador
+  const textoVerificador = $('#texto-verificador');
+  const btnVerificar = $('#btn-verificar');
+  const resultado = $('#resultado-verificacao');
+
+  // Login
+  const btnLogin = $('#btn-login');
+  const btnLogout = $('#btn-logout');
+  const userInfo = $('#user-info');
+  const userEmail = $('#user-email');
+  const modal = $('#modal-login');
+  const formLogin = $('#form-login');
+  const inputEmail = $('#input-email');
+  const emailError = $('#email-error');
+
+  // Cards
+  const cardHeaders = $$('.card-header');
+
+  // ---------- Abas (teclado + ARIA) ----------
+  function activateTab(tab) {
+    tabs.forEach((t) => {
+      const selected = t === tab;
+      t.classList.toggle('active', selected);
+      t.setAttribute('aria-selected', selected ? 'true' : 'false');
+      t.setAttribute('tabindex', selected ? '0' : '-1');
+    });
+
+    panels.forEach((panel) => {
+      const isTarget = panel.id === tab.getAttribute('aria-controls');
+      panel.hidden = !isTarget;
+      panel.classList.toggle('active', isTarget);
+    });
   }
-}
 
-// SISTEMA DE SIMULAÇÃO GMAIL
-function abrirModalGmail() {
-  document.getElementById('modalGmail').classList.remove('hidden');
-}
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => activateTab(tab));
 
-function fecharModalGmail() {
-  document.getElementById('modalGmail').classList.add('hidden');
-}
+    tab.addEventListener('keydown', (e) => {
+      let newIndex = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        newIndex = (index + 1) % tabs.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        newIndex = (index - 1 + tabs.length) % tabs.length;
+      } else if (e.key === 'Home') {
+        newIndex = 0;
+      } else if (e.key === 'End') {
+        newIndex = tabs.length - 1;
+      }
+      if (newIndex !== null) {
+        e.preventDefault();
+        tabs[newIndex].focus();
+        activateTab(tabs[newIndex]);
+      }
+    });
+  });
 
-function salvarGmail() {
-  const email = document.getElementById('inputEmail').value.trim();
-  if (email !== "" && email.includes('@')) {
-    document.querySelector('.btn-gmail').classList.add('hidden');
-    const usuarioDiv = document.getElementById('usuarioLogado');
-    document.getElementById('emailExibido').textContent = `👤 ${email}`;
-    usuarioDiv.classList.remove('hidden');
-    fecharModalGmail();
-  } else {
-    alert("Digite um e-mail válido.");
+  // ---------- Lupa: texto em tempo real ----------
+  function updateDisplay() {
+    const text = textoLupa.value.trim();
+    displayTexto.textContent = text || 'O texto digitado aparecerá aqui em tamanho grande e cor amarela de alto contraste.';
+    applyFontScale();
   }
-}
 
-function deslogarGmail() {
-  document.querySelector('.btn-gmail').classList.remove('hidden');
-  document.getElementById('usuarioLogado').classList.add('hidden');
-  document.getElementById('inputEmail').value = "";
-}
+  function applyFontScale() {
+    displayTexto.style.fontSize = (1.5 * fontScale) + 'rem';
+    zoomLevel.textContent = Math.round(fontScale * 100) + '%';
+  }
+
+  textoLupa.addEventListener('input', updateDisplay);
+
+  btnZoomIn.addEventListener('click', () => {
+    if (fontScale < FONT_MAX) {
+      fontScale = Math.min(FONT_MAX, fontScale + FONT_STEP);
+      applyFontScale();
+    }
+  });
+
+  btnZoomOut.addEventListener('click', () => {
+    if (fontScale > FONT_MIN) {
+      fontScale = Math.max(FONT_MIN, fontScale - FONT_STEP);
+      applyFontScale();
+    }
+  });
+
+  // ---------- Leitura por voz (Web Speech API) ----------
+  function getBestVoice() {
+    const voices = speechSynthesis.getVoices();
+    // Preferir voz pt-BR
+    const ptBR = voices.find((v) => v.lang === 'pt-BR' || v.lang.startsWith('pt-BR'));
+    if (ptBR) return ptBR;
+    const pt = voices.find((v) => v.lang.startsWith('pt'));
+    return pt || voices[0] || null;
+  }
+
+  function speakText() {
+    const text = textoLupa.value.trim();
+    if (!text) {
+      alert('Digite ou cole um texto antes de ouvir.');
+      textoLupa.focus();
+      return;
+    }
+
+    if (!('speechSynthesis' in window)) {
+      alert('Seu navegador não suporta leitura por voz.');
+      return;
+    }
+
+    speechSynthesis.cancel();
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 0.85; // velocidade reduzida para idosos
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    const voice = getBestVoice();
+    if (voice) utterance.voice = voice;
+
+    utterance.onstart = () => {
+      isSpeaking = true;
+      btnOuvir.disabled = true;
+      btnParar.disabled = false;
+    };
+
+    utterance.onend = () => {
+      isSpeaking = false;
+      btnOuvir.disabled = false;
+      btnParar.disabled = true;
+    };
+
+    utterance.onerror = () => {
+      isSpeaking = false;
+      btnOuvir.disabled = false;
+      btnParar.disabled = true;
+    };
+
+    speechSynthesis.speak(utterance);
+  }
+
+  function stopSpeech() {
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    btnOuvir.disabled = false;
+    btnParar.disabled = true;
+  }
+
+  btnOuvir.addEventListener('click', speakText);
+  btnParar.addEventListener('click', stopSpeech);
+
+  // Carregar vozes (alguns browsers atrasam)
+  if ('speechSynthesis' in window) {
+    speechSynthesis.getVoices();
+    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+  }
+
+  // ---------- Verificador Antigolpe ----------
+  function analisarMensagem(texto) {
+    const lower = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const encontradas = [];
+
+    PALAVRAS_RISCO.forEach((palavra) => {
+      const p = palavra.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (lower.includes(p) && !encontradas.includes(palavra)) {
+        encontradas.push(palavra);
+      }
+    });
+
+    return encontradas;
+  }
+
+  function renderResultado(encontradas) {
+    resultado.hidden = false;
+
+    if (encontradas.length > 0) {
+      resultado.className = 'resultado alerta';
+      resultado.innerHTML = `
+        <p class="resultado-titulo">⚠️ Atenção: possíveis sinais de golpe</p>
+        <p>Encontramos palavras ou expressões de risco nesta mensagem:</p>
+        <ul>
+          ${encontradas.map((p) => `<li><strong>${escapeHtml(p)}</strong></li>`).join('')}
+        </ul>
+        <div class="resultado-dicas">
+          <strong>Dicas de segurança:</strong>
+          <ul>
+            <li>Não transfira dinheiro nem envie PIX sem confirmar por telefone com o número antigo que você já conhece.</li>
+            <li>Nunca informe códigos de SMS, senhas ou tokens a ninguém.</li>
+            <li>Desconfie de pedidos urgentes e de números de celular novos.</li>
+            <li>Em dúvida, desligue e ligue você mesmo para o banco ou familiar.</li>
+          </ul>
+        </div>
+      `;
+    } else {
+      resultado.className = 'resultado seguro';
+      resultado.innerHTML = `
+        <p class="resultado-titulo">✅ Nenhum termo suspeito evidente</p>
+        <p>Não detectamos as palavras de risco mais comuns nesta mensagem.</p>
+        <div class="resultado-dicas">
+          <strong>Mesmo assim, fique atento:</strong>
+          <ul>
+            <li>Golpes novos aparecem o tempo todo. Se algo parecer estranho, confirme por outro canal.</li>
+            <li>Nunca clique em links suspeitos nem baixe aplicativos pedidos por mensagem.</li>
+            <li>Bancos e órgãos oficiais nunca pedem senha ou token por telefone ou WhatsApp.</li>
+          </ul>
+        </div>
+      `;
+    }
+
+    resultado.focus();
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  btnVerificar.addEventListener('click', () => {
+    const texto = textoVerificador.value.trim();
+    if (!texto) {
+      alert('Cole ou digite a mensagem suspeita antes de verificar.');
+      textoVerificador.focus();
+      return;
+    }
+    const encontradas = analisarMensagem(texto);
+    renderResultado(encontradas);
+  });
+
+  // ---------- Cards expansíveis (Guia) ----------
+  cardHeaders.forEach((header) => {
+    header.addEventListener('click', () => {
+      const card = header.closest('.card');
+      const body = document.getElementById(header.getAttribute('aria-controls'));
+      const expanded = header.getAttribute('aria-expanded') === 'true';
+
+      header.setAttribute('aria-expanded', !expanded);
+      card.setAttribute('data-expanded', !expanded);
+      body.hidden = expanded;
+    });
+
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        header.click();
+      }
+    });
+  });
+
+  // ---------- Modal Login ----------
+  let lastFocus = null;
+
+  function openModal() {
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    inputEmail.value = '';
+    emailError.hidden = true;
+    inputEmail.focus();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    if (lastFocus) lastFocus.focus();
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  btnLogin.addEventListener('click', openModal);
+
+  modal.querySelectorAll('[data-close-modal]').forEach((el) => {
+    el.addEventListener('click', closeModal);
+  });
+
+  // Fechar com Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.hidden) {
+      closeModal();
+    }
+  });
+
+  // Trap de foco no modal
+  modal.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || modal.hidden) return;
+    const focusables = modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const list = Array.from(focusables).filter((el) => !el.disabled && el.offsetParent !== null);
+    if (list.length === 0) return;
+    const first = list[0];
+    const last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  formLogin.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = inputEmail.value.trim();
+    if (!isValidEmail(email)) {
+      emailError.hidden = false;
+      inputEmail.focus();
+      return;
+    }
+    emailError.hidden = true;
+    userEmail.textContent = email;
+    userInfo.hidden = false;
+    btnLogin.hidden = true;
+    closeModal();
+  });
+
+  btnLogout.addEventListener('click', () => {
+    userInfo.hidden = true;
+    btnLogin.hidden = false;
+    userEmail.textContent = '';
+  });
+
+  // ---------- Inicialização ----------
+  applyFontScale();
+  updateDisplay();
+})();

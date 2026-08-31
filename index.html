@@ -3,111 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal da Leitura & Segurança</title>
+  <meta name="description" content="Aplicação de prevenção contra golpes digitais para idosos - Lupa, leitor de voz e verificador de mensagens suspeitas">
+  <meta name="theme-color" content="#121212">
+  <title>ProtegeIdoso - Prevenção de Golpes Digitais</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- BARRA SUPERIOR ESTILO GOOGLE -->
-  <header class="barra-topo">
-    <div class="logo">
-      <span class="g-azul">A</span><span class="g-vermelho">m</span><span class="g-amarelo">i</span><span class="g-azul">g</span><span class="g-verde">o</span>
-    </div>
-    
-    <!-- ÁREA DO GMAIL -->
-    <div class="area-usuario">
-      <button class="btn-gmail" onclick="abrirModalGmail()">📧 Entrar com Gmail</button>
-      <div id="usuarioLogado" class="usuario-logado hidden">
-        <span id="emailExibido"></span>
-        <button class="btn-sair" onclick="deslogarGmail()">Sair</button>
+  <!-- Cabeçalho estilo Google -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <a href="#" class="logo" aria-label="ProtegeIdoso - Página inicial">
+        <span class="logo-letter logo-b">P</span>
+        <span class="logo-letter logo-r">r</span>
+        <span class="logo-letter logo-o">o</span>
+        <span class="logo-letter logo-t">t</span>
+        <span class="logo-letter logo-e">e</span>
+        <span class="logo-letter logo-g">g</span>
+        <span class="logo-letter logo-e2">e</span>
+        <span class="logo-text">Idoso</span>
+      </a>
+      <div class="header-actions">
+        <div id="user-info" class="user-info" hidden>
+          <span id="user-email" class="user-email" aria-live="polite"></span>
+          <button type="button" id="btn-logout" class="btn btn-outline" aria-label="Sair da conta">
+            Sair
+          </button>
+        </div>
+        <button type="button" id="btn-login" class="btn btn-gmail" aria-haspopup="dialog" aria-controls="modal-login">
+          <svg class="gmail-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path fill="#EA4335" d="M5 5h14v14H5z"/>
+            <path fill="#FBBC05" d="M5 5l7 5.5L19 5"/>
+            <path fill="#34A853" d="M5 5v14l7-5.5"/>
+            <path fill="#4285F4" d="M19 5v14l-7-5.5"/>
+          </svg>
+          Entrar com Gmail
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- NAVEGAÇÃO PRINCIPAL -->
-  <nav class="menu-navegacao">
-    <button class="tab-btn ativa" onclick="mudarAba(event, 'aba-lupa')">🔍 Lupa & Leitura por Voz</button>
-    <button class="tab-btn" onclick="mudarAba(event, 'aba-verificador')">🛡️ Verificador Antigolpe</button>
-    <button class="tab-btn" onclick="mudarAba(event, 'aba-guias')">📚 Guia de Segurança</button>
-  </nav>
+  <main class="main" role="main">
+    <!-- Navegação por abas -->
+    <div class="tabs-wrapper">
+      <div class="tabs" role="tablist" aria-label="Funcionalidades principais">
+        <button type="button" class="tab active" role="tab" id="tab-lupa" aria-selected="true" aria-controls="panel-lupa" tabindex="0">
+          🔍 Lupa &amp; Leitura por Voz
+        </button>
+        <button type="button" class="tab" role="tab" id="tab-verificador" aria-selected="false" aria-controls="panel-verificador" tabindex="-1">
+          🛡️ Verificador Antigolpe
+        </button>
+        <button type="button" class="tab" role="tab" id="tab-guia" aria-selected="false" aria-controls="panel-guia" tabindex="-1">
+          📚 Guia de Segurança
+        </button>
+      </div>
+    </div>
 
-  <main class="conteudo-principal">
+    <!-- Painel 1: Lupa & Leitura por Voz -->
+    <section id="panel-lupa" class="tab-panel active" role="tabpanel" aria-labelledby="tab-lupa" tabindex="0">
+      <h1 class="panel-title">Lupa &amp; Leitura por Voz</h1>
+      <p class="panel-desc">Cole ou digite uma mensagem para ampliar e ouvir em voz alta. Ideal para quem tem dificuldade de leitura.</p>
 
-    <!-- ABA 1: LUPA E VOZ -->
-    <section id="aba-lupa" class="aba-conteudo ativa">
-      <div class="caixa-busca">
-        <h2>🔍 Lupa e Leitor por Voz</h2>
-        <p class="subtitulo">Digite ou cole qualquer texto para ampliar e ouvir com facilidade.</p>
-        
-        <textarea id="textoEntrada" rows="4" placeholder="Cole seu texto ou mensagem aqui..."></textarea>
-        
-        <div class="painel-controles">
-          <button type="button" class="btn-acao btn-amarelo" onclick="alterarTamanho(4)">➕ Aumentar Letra</button>
-          <button type="button" class="btn-acao btn-cinza" onclick="alterarTamanho(-4)">➖ Diminuir Letra</button>
-          <button type="button" class="btn-acao btn-azul" onclick="ouvirTexto()">🔊 Ouvir Texto</button>
-          <button type="button" class="btn-acao btn-vermelho" onclick="pararVoz()">⏹️ Parar Voz</button>
+      <div class="form-group">
+        <label for="texto-lupa" class="label">Cole ou digite o texto da mensagem:</label>
+        <textarea
+          id="texto-lupa"
+          class="textarea"
+          rows="5"
+          placeholder="Exemplo: Olá mãe, perdi meu celular. Me manda um PIX urgente para este número novo..."
+          aria-describedby="texto-lupa-hint"
+        ></textarea>
+        <p id="texto-lupa-hint" class="hint">Você pode colar mensagens do WhatsApp ou SMS aqui.</p>
+      </div>
+
+      <div class="controls-row">
+        <div class="zoom-controls" role="group" aria-label="Controles de tamanho da fonte">
+          <button type="button" id="btn-zoom-out" class="btn btn-secondary" aria-label="Diminuir tamanho da fonte">
+            A−
+          </button>
+          <span id="zoom-level" class="zoom-level" aria-live="polite">100%</span>
+          <button type="button" id="btn-zoom-in" class="btn btn-secondary" aria-label="Aumentar tamanho da fonte">
+            A+
+          </button>
         </div>
+        <div class="voice-controls" role="group" aria-label="Controles de leitura por voz">
+          <button type="button" id="btn-ouvir" class="btn btn-primary">
+            🔊 Ouvir Texto
+          </button>
+          <button type="button" id="btn-parar" class="btn btn-outline" disabled>
+            ⏹ Parar Voz
+          </button>
+        </div>
+      </div>
 
-        <div class="caixa-exibicao">
-          <label>Resultado Ampliado:</label>
-          <div id="textoAmpliado" class="display-texto">O seu texto aparecerá aqui...</div>
+      <div class="display-area" aria-live="polite">
+        <h2 class="display-title">Texto ampliado</h2>
+        <div id="display-texto" class="display-texto" role="region" aria-label="Texto ampliado em alto contraste">
+          O texto digitado aparecerá aqui em tamanho grande e cor amarela de alto contraste.
         </div>
       </div>
     </section>
 
-    <!-- ABA 2: VERIFICADOR ANTIGOLPE -->
-    <section id="aba-verificador" class="aba-conteudo">
-      <div class="caixa-busca">
-        <h2>🛡️ Analisador de Mensagens Suspeitas</h2>
-        <p class="subtitulo">Cole mensagens do WhatsApp ou SMS para verificar o risco de fraude.</p>
+    <!-- Painel 2: Verificador Antigolpe -->
+    <section id="panel-verificador" class="tab-panel" role="tabpanel" aria-labelledby="tab-verificador" hidden tabindex="0">
+      <h1 class="panel-title">Verificador Antigolpe</h1>
+      <p class="panel-desc">Cole mensagens suspeitas de WhatsApp ou SMS. O sistema analisa palavras de risco e orienta você.</p>
 
-        <textarea id="textoAnalisar" rows="4" placeholder="Exemplo: Mãe, mudei de número, me faz um PIX urgente..."></textarea>
+      <div class="form-group">
+        <label for="texto-verificador" class="label">Cole a mensagem suspeita:</label>
+        <textarea
+          id="texto-verificador"
+          class="textarea"
+          rows="5"
+          placeholder="Cole aqui a mensagem que você recebeu..."
+          aria-describedby="texto-verificador-hint"
+        ></textarea>
+        <p id="texto-verificador-hint" class="hint">Analisamos palavras como: pix, urgente, bloqueado, código, filho, número novo, entre outras.</p>
+      </div>
 
-        <button type="button" class="btn-busca-principal" onclick="analisarGolpe()">🔍 VERIFICAR MENSAGEM</button>
+      <button type="button" id="btn-verificar" class="btn btn-primary btn-large">
+        🛡️ Verificar Mensagem
+      </button>
 
-        <div id="painelResultado" class="resultado-analise hidden"></div>
+      <div id="resultado-verificacao" class="resultado" hidden role="alert" aria-live="assertive">
+        <!-- Preenchido via JS -->
       </div>
     </section>
 
-    <!-- ABA 3: GUIAS E INFORMAÇÕES -->
-    <section id="aba-guias" class="aba-conteudo">
-      <div class="caixa-busca">
-        <h2>📚 Guia Completo de Prevenção</h2>
-        
-        <div class="grid-informacoes">
-          <!-- CARD WHATSAPP -->
-          <article class="card-info">
-            <h3>📱 Golpes no WhatsApp</h3>
+    <!-- Painel 3: Guia de Segurança -->
+    <section id="panel-guia" class="tab-panel" role="tabpanel" aria-labelledby="tab-guia" hidden tabindex="0">
+      <h1 class="panel-title">Guia de Segurança</h1>
+      <p class="panel-desc">Aprenda a reconhecer os golpes mais comuns. Toque em cada card para ver os detalhes.</p>
+
+      <div class="cards-grid">
+        <!-- Golpes WhatsApp -->
+        <article class="card" data-expanded="false">
+          <button type="button" class="card-header" aria-expanded="false" aria-controls="card-falso-parente">
+            <span class="card-icon" aria-hidden="true">👨‍👩‍👧</span>
+            <span class="card-title">Falso Parente (WhatsApp)</span>
+            <span class="card-chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="card-falso-parente" class="card-body" hidden>
+            <p><strong>Como funciona:</strong> O golpista cria um número novo e se passa pelo filho, neto ou familiar. Diz que perdeu o celular e pede PIX urgente ou transferência.</p>
+            <p><strong>Sinais de alerta:</strong></p>
             <ul>
-              <li><strong>Falso Parente:</strong> Usam foto de um familiar com número novo pedindo dinheiro urgente. Ligue no número antigo antes de pagar.</li>
-              <li><strong>Código SMS:</strong> Nunca passe códigos de 6 dígitos que chegaram no seu celular. Eles servem para roubar sua conta.</li>
-              <li><strong>Links Falsos:</strong> Promessas de prêmios ou recadastramento de conta costumam ser roubo de dados.</li>
+              <li>Número diferente do habitual</li>
+              <li>Pedido de dinheiro com urgência</li>
+              <li>Pedido para não contar para ninguém</li>
+              <li>Uso de palavras como “mãe”, “pai”, “urgente”, “PIX”</li>
             </ul>
-          </article>
+            <p class="dica-segura"><strong>O que fazer:</strong> Ligue para o familiar pelo número antigo que você já conhece. Nunca transfira dinheiro sem confirmar por voz.</p>
+          </div>
+        </article>
 
-          <!-- CARD LIGAÇÕES -->
-          <article class="card-info">
-            <h3>📞 Golpes por Ligação</h3>
+        <article class="card" data-expanded="false">
+          <button type="button" class="card-header" aria-expanded="false" aria-controls="card-codigo-sms">
+            <span class="card-icon" aria-hidden="true">📱</span>
+            <span class="card-title">Código SMS / Token</span>
+            <span class="card-chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="card-codigo-sms" class="card-body" hidden>
+            <p><strong>Como funciona:</strong> Alguém liga ou manda mensagem pedindo o código que chegou por SMS (token do banco, WhatsApp, governo etc.). Com o código, o criminoso acessa sua conta.</p>
+            <p><strong>Sinais de alerta:</strong></p>
             <ul>
-              <li><strong>Falsa Central Bancária:</strong> Dizem que houve uma compra suspeita e pedem senhas. Desligue e ligue no número atrás do seu cartão.</li>
-              <li><strong>Motoboy do Banco:</strong> Nenhum banco manda buscar seu cartão em casa, mesmo se estiver cortado ao meio.</li>
-              <li><strong>Falso Sequestro:</strong> Se ligarem chorando pedindo resgate, desligue e confirme a segurança do seu familiar.</li>
+              <li>Pedido do código que “acabou de chegar”</li>
+              <li>Pressão para informar rápido</li>
+              <li>Diz ser do banco, da operadora ou do suporte</li>
             </ul>
-          </article>
-        </div>
+            <p class="dica-segura"><strong>O que fazer:</strong> NUNCA informe códigos de SMS a ninguém. Bancos e empresas legítimas nunca pedem esse código por telefone ou mensagem.</p>
+          </div>
+        </article>
+
+        <article class="card" data-expanded="false">
+          <button type="button" class="card-header" aria-expanded="false" aria-controls="card-links-falsos">
+            <span class="card-icon" aria-hidden="true">🔗</span>
+            <span class="card-title">Links Falsos</span>
+            <span class="card-chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="card-links-falsos" class="card-body" hidden>
+            <p><strong>Como funciona:</strong> Você recebe um link que parece ser do banco, dos Correios, da Receita ou de entrega. Ao clicar, o site rouba senha ou instala vírus.</p>
+            <p><strong>Sinais de alerta:</strong></p>
+            <ul>
+              <li>Link encurtado ou com letras estranhas</li>
+              <li>Urgência (“sua conta será bloqueada”)</li>
+              <li>Endereço que não é o oficial do banco</li>
+            </ul>
+            <p class="dica-segura"><strong>O que fazer:</strong> Não clique. Abra o aplicativo oficial do banco ou digite o endereço no navegador. Em dúvida, ligue para o número oficial que está no verso do cartão.</p>
+          </div>
+        </article>
+
+        <!-- Golpes por telefone -->
+        <article class="card" data-expanded="false">
+          <button type="button" class="card-header" aria-expanded="false" aria-controls="card-falsa-central">
+            <span class="card-icon" aria-hidden="true">🏦</span>
+            <span class="card-title">Falsa Central do Banco</span>
+            <span class="card-chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="card-falsa-central" class="card-body" hidden>
+            <p><strong>Como funciona:</strong> Ligam dizendo ser do banco e avisam de compra suspeita ou problema na conta. Pedem senha, token ou para instalar aplicativo de acesso remoto.</p>
+            <p><strong>Sinais de alerta:</strong></p>
+            <ul>
+              <li>Ligação inesperada falando em “fraude”</li>
+              <li>Pedido de senha, token ou dados do cartão</li>
+              <li>Orientação para baixar app de “suporte”</li>
+            </ul>
+            <p class="dica-segura"><strong>O que fazer:</strong> Desligue. Ligue você mesmo para o número oficial impresso no verso do cartão. Nunca informe senha ou token por telefone.</p>
+          </div>
+        </article>
+
+        <article class="card" data-expanded="false">
+          <button type="button" class="card-header" aria-expanded="false" aria-controls="card-motoboy">
+            <span class="card-icon" aria-hidden="true">🛵</span>
+            <span class="card-title">Motoboy do Banco</span>
+            <span class="card-chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="card-motoboy" class="card-body" hidden>
+            <p><strong>Como funciona:</strong> Após a ligação falsa, dizem que um motoboy vai buscar o cartão “para segurança” ou para “desbloquear”. O cartão é levado e usado para compras.</p>
+            <p><strong>Sinais de alerta:</strong></p>
+            <ul>
+              <li>Pedido para entregar cartão a um terceiro</li>
+              <li>Urgência e medo (“vai perder o dinheiro”)</li>
+              <li>Pessoa que chega em casa pedindo o cartão</li>
+            </ul>
+            <p class="dica-segura"><strong>O que fazer:</strong> Bancos NUNCA mandam motoboy buscar cartão. Não entregue. Bloqueie o cartão pelo aplicativo ou telefone oficial e denuncie.</p>
+          </div>
+        </article>
+
+        <article class="card" data-expanded="false">
+          <button type="button" class="card-header" aria-expanded="false" aria-controls="card-falso-sequestro">
+            <span class="card-icon" aria-hidden="true">🚨</span>
+            <span class="card-title">Falso Sequestro</span>
+            <span class="card-chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="card-falso-sequestro" class="card-body" hidden>
+            <p><strong>Como funciona:</strong> Ligam dizendo que um familiar foi sequestrado e pedem resgate em PIX ou transferência imediata. Usam gritos e pressão emocional.</p>
+            <p><strong>Sinais de alerta:</strong></p>
+            <ul>
+              <li>Pedido de dinheiro imediato sob ameaça</li>
+              <li>Proibição de ligar para o familiar</li>
+              <li>Voz alterada ou gravada</li>
+            </ul>
+            <p class="dica-segura"><strong>O que fazer:</strong> Mantenha a calma. Desligue e ligue imediatamente para o familiar pelo número que você já conhece. Em quase todos os casos é golpe. Se necessário, chame a polícia (190).</p>
+          </div>
+        </article>
       </div>
     </section>
-
   </main>
 
-  <!-- MODAL DO GMAIL -->
-  <div id="modalGmail" class="modal hidden">
-    <div class="conteudo-modal">
-      <span class="fechar" onclick="fecharModalGmail()">&times;</span>
-      <h2>📧 Conectar Gmail</h2>
-      <p>Digite seu e-mail para personalizar sua experiência:</p>
-      <input type="email" id="inputEmail" placeholder="seuemail@gmail.com">
-      <button class="btn-busca-principal" onclick="salvarGmail()">Salvar e Conectar</button>
+  <footer class="footer" role="contentinfo">
+    <p>ProtegeIdoso — Ferramenta educativa de prevenção a golpes digitais.</p>
+    <p class="footer-note">Em caso de golpe, registre boletim de ocorrência e contate seu banco imediatamente.</p>
+  </footer>
+
+  <!-- Modal de Login (acessível) -->
+  <div id="modal-login" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content">
+      <h2 id="modal-title" class="modal-title">Entrar com Gmail</h2>
+      <p class="modal-desc">Simulação de login. Digite um e-mail para continuar.</p>
+      <form id="form-login" novalidate>
+        <div class="form-group">
+          <label for="input-email" class="label">E-mail</label>
+          <input
+            type="email"
+            id="input-email"
+            class="input"
+            placeholder="seu.email@gmail.com"
+            autocomplete="email"
+            required
+            aria-required="true"
+            aria-describedby="email-error"
+          >
+          <p id="email-error" class="error-msg" role="alert" hidden>Digite um e-mail válido.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" data-close-modal>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </div>
+      </form>
     </div>
   </div>
 
