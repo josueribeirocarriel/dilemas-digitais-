@@ -1,4 +1,4 @@
-/* Configurações Globais de Acessibilidade */
+/* ALTO CONTRASTE E ACESSIBILIDADE */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,46 +7,86 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #f4f6f9;
-  color: #111111;
-  padding: 20px;
-  font-size: 22px; /* Base de texto grande */
+  background-color: #000000; /* Fundo preto puro */
+  color: #ffffff; /* Texto branco puro */
+  padding: 15px;
+  font-size: 22px;
   line-height: 1.6;
 }
 
+/* CABEÇALHO */
 .cabecalho {
   text-align: center;
-  margin-bottom: 30px;
-  background-color: #003366;
-  color: #ffffff;
-  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #000000;
+  color: #ffff00; /* Amarelo de alto contraste */
+  padding: 15px;
+  border: 4px solid #ffff00;
   border-radius: 12px;
 }
 
 .cabecalho h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
+  font-size: 38px;
+  margin-bottom: 5px;
 }
 
+/* NAVEGAÇÃO POR ABAS */
 .conteudo-principal {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-/* Cartões de Funcionalidade */
+.navegacao-abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.aba-btn {
+  flex: 1 1 200px;
+  background-color: #111111;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 15px;
+  border: 3px solid #ffffff;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.aba-btn.ativa {
+  background-color: #ffff00; /* Amarelo alto contraste */
+  color: #000000;
+  border-color: #ffff00;
+}
+
+/* CONTEÚDO DAS ABAS */
+.aba-conteudo {
+  display: none;
+}
+
+.aba-conteudo.ativa {
+  display: block;
+}
+
+/* CARTÕES E ELEMENTOS DE INTERFACE */
 .cartao {
-  background: #ffffff;
-  border: 3px solid #003366;
+  background-color: #000000;
+  border: 4px solid #ffffff;
   border-radius: 12px;
   padding: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
 }
 
 .cartao h2 {
-  font-size: 30px;
-  color: #003366;
+  font-size: 32px;
+  color: #ffff00;
   margin-bottom: 15px;
+  border-bottom: 2px solid #ffff00;
+  padding-bottom: 10px;
 }
 
 label {
@@ -54,77 +94,169 @@ label {
   display: block;
   margin-bottom: 10px;
   font-size: 24px;
+  color: #ffffff;
 }
 
 textarea {
   width: 100%;
-  font-size: 22px;
+  font-size: 24px;
   padding: 15px;
-  border: 3px solid #333333;
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: bold;
+  border: 4px solid #ffff00;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   resize: vertical;
 }
 
-/* Slider de Tamanho da Letra */
-.controle-tamanho {
+/* CONTROLES DA LUPA */
+.controles-lupa {
+  display: flex;
+  gap: 15px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-input[type="range"] {
-  width: 100%;
-  height: 25px;
+.btn-controle {
+  flex: 1 1 200px;
+  background-color: #000000;
+  color: #ffff00;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px;
+  border: 3px solid #ffff00;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-/* Caixa de Exibição do Texto Ampliado */
-.texto-ampliado {
-  background-color: #ffffcc;
-  color: #000000;
-  padding: 20px;
-  border: 2px solid #000000;
-  border-radius: 8px;
-  min-height: 100px;
-  word-wrap: break-word;
+.btn-controle.btn-secundario {
+  color: #ffffff;
+  border-color: #ffffff;
 }
 
-/* Botões Acessíveis */
-.botao-principal {
+.texto-ampliado {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: bold;
+  padding: 20px;
+  border: 4px solid #ffff00;
+  border-radius: 8px;
+  min-height: 120px;
+  word-wrap: break-word;
+  transition: font-size 0.2s ease;
+}
+
+/* BOTÕES DE AÇÃO */
+.botao-acao {
   width: 100%;
-  background-color: #0055a5;
-  color: #ffffff;
-  font-size: 26px;
+  background-color: #ffff00;
+  color: #000000;
+  font-size: 28px;
   font-weight: bold;
   padding: 18px;
-  border: 3px solid #000000;
+  border: 4px solid #ffffff;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  margin-top: 10px;
 }
 
-.botao-principal:hover {
-  background-color: #003366;
+/* ESTRUTURA DAS SUB-ABAS (GOLPES) */
+.instrucao-aba {
+  margin-bottom: 15px;
+  font-size: 22px;
 }
 
-/* Estilos de Alerta para Golpes */
+.sub-navegacao {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.sub-aba-btn {
+  flex: 1 1 200px;
+  background-color: #222222;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sub-aba-btn.ativa {
+  background-color: #00ffff; /* Ciano alto contraste */
+  color: #000000;
+  border-color: #00ffff;
+}
+
+.sub-aba-conteudo {
+  display: none;
+  background-color: #111111;
+  padding: 20px;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+}
+
+.sub-aba-conteudo.ativa {
+  display: block;
+}
+
+.sub-aba-conteudo h3 {
+  color: #00ffff;
+  font-size: 26px;
+  margin-bottom: 15px;
+}
+
+.lista-explicativa {
+  list-style-type: none;
+}
+
+.lista-explicativa li {
+  margin-bottom: 20px;
+  padding-left: 10px;
+  border-left: 4px solid #00ffff;
+  font-size: 22px;
+}
+
+.lista-explicativa strong {
+  color: #ffff00;
+  display: block;
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+/* ALERTAS DE VERIFICAÇÃO */
 .hidden {
   display: none;
 }
 
-.alerta-perigo {
-  background-color: #ffcccc;
-  border: 3px solid #cc0000;
-  color: #660000;
-  padding: 20px;
-  border-radius: 8px;
+.caixa-resposta {
   margin-top: 20px;
 }
 
-.alerta-seguro {
-  background-color: #d4edda;
-  border: 3px solid #28a745;
-  color: #155724;
+.alerta-perigo {
+  background-color: #000000;
+  border: 4px solid #ff0000;
+  color: #ff3333;
   padding: 20px;
   border-radius: 8px;
-  margin-top: 20px;
+}
+
+.alerta-perigo strong, .alerta-perigo h3 {
+  color: #ff0000;
+}
+
+.alerta-seguro {
+  background-color: #000000;
+  border: 4px solid #00ff00;
+  color: #00ff00;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.alerta-seguro h3 {
+  color: #00ff00;
 }
