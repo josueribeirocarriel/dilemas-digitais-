@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistente Amigo - Acessibilidade e Segurança</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="cabecalho">
+    <h1>👓 Assistente Amigo</h1>
+    <p>Seu espaço seguro para ler com facilidade e evitar golpes.</p>
+  </header>
+
+  <main class="conteudo-principal">
+
+    <!-- SEÇÃO 1: LUPA DE TEXTO -->
+    <section class="cartao">
+      <h2>🔍 Lupa de Leitura</h2>
+      <label for="textoLupa">Cole ou digite seu texto abaixo:</label>
+      <textarea id="textoLupa" rows="4" placeholder="Cole a mensagem ou texto aqui..."></textarea>
+      
+      <div class="controle-tamanho">
+        <label for="sliderTamanho">Tamanho da letra:</label>
+        <input type="range" id="sliderTamanho" min="24" max="60" value="36">
+      </div>
+
+      <div class="caixa-resposta">
+        <h3>Resultado Ampliado:</h3>
+        <div id="resultadoLupa" class="texto-ampliado">O texto ampliado aparecerá aqui.</div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: DETECTOR DE GOLPES -->
+    <section class="cartao">
+      <h2>🛡️ Verificador de Golpes</h2>
+      <label for="textoGolpe">Recebeu uma mensagem estranha? Cole aqui:</label>
+      <textarea id="textoGolpe" rows="4" placeholder="Exemplo: Preciso de um PIX urgente..."></textarea>
+      
+      <button onclick="verificarGolpe()" class="botao-principal">ANALISAR MENSAGEM</button>
+
+      <div id="resultadoGolpe" class="caixa-resposta hidden"></div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

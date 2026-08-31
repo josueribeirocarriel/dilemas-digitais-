@@ -1,0 +1,67 @@
+// LÓGICA DA LUPA DE LEITURA
+const textoLupa = document.getElementById('textoLupa');
+const sliderTamanho = document.getElementById('sliderTamanho');
+const resultadoLupa = document.getElementById('resultadoLupa');
+
+// Atualiza o texto e o tamanho da fonte em tempo real
+function atualizarLupa() {
+  const texto = textoLupa.value.trim();
+  const tamanho = sliderTamanho.value;
+
+  resultadoLupa.style.fontSize = `${tamanho}px`;
+
+  if (texto !== "") {
+    resultadoLupa.textContent = texto;
+  } else {
+    resultadoLupa.textContent = "O texto ampliado aparecerá aqui.";
+  }
+}
+
+textoLupa.addEventListener('input', atualizarLupa);
+sliderTamanho.addEventListener('input', atualizarLupa);
+
+
+// LÓGICA DO DETECTOR DE GOLPES
+function verificarGolpe() {
+  const mensagem = document.getElementById('textoGolpe').value.toLowerCase().trim();
+  const resultadoDiv = document.getElementById('resultadoGolpe');
+
+  if (mensagem === "") {
+    alert("Por favor, cole uma mensagem antes de clicar no botão.");
+    return;
+  }
+
+  // Lista de palavras e expressões comuns em golpes
+  const palavrasSuspeitas = [
+    "pix", "urgente", "bloqueado", "bloqueio", "senha", "banco", 
+    "transferência", "premio", "prêmio", "sorteio", "clique no link", 
+    "recadastramento", "atualize", "código", "verificação", "filho", 
+    "mãe", "pai", "preciso de dinheiro", "número novo"
+  ];
+
+  // Encontra quais palavras suspeitas aparecem na mensagem
+  const encontradas = palavrasSuspeitas.filter(palavra => mensagem.includes(palavra));
+
+  resultadoDiv.classList.remove('hidden');
+
+  if (encontradas.length > 0) {
+    resultadoDiv.className = "caixa-resposta alerta-perigo";
+    resultadoDiv.innerHTML = `
+      <h3>⚠️ ATENÇÃO: ESTA MENSAGEM PODE SER UM GOLPE!</h3>
+      <p><strong>Termos suspeitos identificados:</strong> ${encontradas.join(', ')}.</p>
+      <br>
+      <p>💡 <strong>Dicas importantes:</strong></p>
+      <ul>
+        <li>Não envie dinheiro ou PIX.</li>
+        <li>Não clique em links anexados.</li>
+        <li>Ligue diretamente para a pessoa ou banco para confirmar.</li>
+      </ul>
+    `;
+  } else {
+    resultadoDiv.className = "caixa-resposta alerta-seguro";
+    resultadoDiv.innerHTML = `
+      <h3>✅ Nenhum termo suspeito comum foi encontrado.</h3>
+      <p>Mesmo assim, fique atento: nunca envie senhas, códigos de confirmação ou dados pessoais a ninguém!</p>
+    `;
+  }
+}
