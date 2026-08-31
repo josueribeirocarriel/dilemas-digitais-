@@ -1,68 +1,58 @@
-// CONTROLE DE NAVEGAÇÃO POR ABAS
-function abrirAba(evento, idAba) {
-  const conteudos = document.querySelectorAll('.aba-conteudo');
-  conteudos.forEach(conteudo => conteudo.classList.remove('ativa'));
-
-  const botoes = document.querySelectorAll('.aba-btn');
-  botoes.forEach(botao => botao.classList.remove('ativa'));
+// CONTROLE DE NAVEGAÇÃO
+function mudarAba(evento, idAba) {
+  document.querySelectorAll('.aba-conteudo').forEach(aba => aba.classList.remove('ativa'));
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativa'));
 
   document.getElementById(idAba).classList.add('ativa');
   evento.currentTarget.classList.add('ativa');
 }
 
-// CONTROLE DAS SUB-ABAS DE GOLPES
-function abrirSubAba(evento, idSubAba) {
-  const conteudos = document.querySelectorAll('.sub-aba-conteudo');
-  conteudos.forEach(conteudo => conteudo.classList.remove('ativa'));
+// LÚPA E CONTROLE DE FONTE
+let tamanhoFonte = 32;
+const textoEntrada = document.getElementById('textoEntrada');
+const textoAmpliado = document.getElementById('textoAmpliado');
 
-  const botoes = document.querySelectorAll('.sub-aba-btn');
-  botoes.forEach(botao => botao.classList.remove('ativa'));
-
-  document.getElementById(idSubAba).classList.add('ativa');
-  evento.currentTarget.classList.add('ativa');
+function atualizarDisplay() {
+  const texto = textoEntrada.value.trim();
+  textoAmpliado.style.fontSize = `${tamanhoFonte}px`;
+  textoAmpliado.textContent = texto !== "" ? texto : "O seu texto aparecerá aqui...";
 }
 
-// LÓGICA DA LUPA (AMPLIAR E VOLTAR AO NORMAL)
-let tamanhoAtual = 32; // Tamanho base
-const tamanhoPadrao = 32;
-const tamanhoMaximo = 64;
-
-const textoLupa = document.getElementById('textoLupa');
-const resultadoLupa = document.getElementById('resultadoLupa');
-
-function atualizarLupa() {
-  const texto = textoLupa.value.trim();
-  resultadoLupa.style.fontSize = `${tamanhoAtual}px`;
-
-  if (texto !== "") {
-    resultadoLupa.textContent = texto;
-  } else {
-    resultadoLupa.textContent = "O texto ampliado aparecerá aqui.";
+function alterarTamanho(variacao) {
+  if (tamanhoFonte + variacao >= 20 && tamanhoFonte + variacao <= 72) {
+    tamanhoFonte += variacao;
+    atualizarDisplay();
   }
 }
 
-function ampliarTexto() {
-  if (tamanhoAtual < tamanhoMaximo) {
-    tamanhoAtual += 6;
-    atualizarLupa();
+textoEntrada.addEventListener('input', atualizarDisplay);
+
+// LEITURA POR VOZ (SÍNTESE DE VOZ DA WEB)
+function ouvirTexto() {
+  const texto = textoEntrada.value.trim();
+  if (texto === "") {
+    alert("Digite um texto antes de clicar em ouvir.");
+    return;
   }
+
+  window.speechSynthesis.cancel(); // Para leituras anteriores
+  const mensagem = new SpeechSynthesisUtterance(texto);
+  mensagem.lang = 'pt-BR';
+  mensagem.rate = 0.9; // Velocidade levemente reduzida para idosos
+  window.speechSynthesis.speak(mensagem);
 }
 
-function restaurarTexto() {
-  tamanhoAtual = tamanhoPadrao;
-  atualizarLupa();
+function pararVoz() {
+  window.speechSynthesis.cancel();
 }
 
-textoLupa.addEventListener('input', atualizarLupa);
-
-
-// LÓGICA DO VERIFICADOR DE GOLPES
-function verificarGolpe() {
-  const mensagem = document.getElementById('textoGolpe').value.toLowerCase().trim();
-  const resultadoDiv = document.getElementById('resultadoGolpe');
+// VERIFICADOR DE GOLPES
+function analisarGolpe() {
+  const mensagem = document.getElementById('textoAnalisar').value.toLowerCase().trim();
+  const painel = document.getElementById('painelResultado');
 
   if (mensagem === "") {
-    alert("Por favor, cole uma mensagem antes de clicar no botão.");
+    alert("Por favor, digite ou cole a mensagem para analisar.");
     return;
   }
 
@@ -74,27 +64,49 @@ function verificarGolpe() {
   ];
 
   const encontradas = palavrasSuspeitas.filter(palavra => mensagem.includes(palavra));
-
-  resultadoDiv.classList.remove('hidden');
+  painel.classList.remove('hidden');
 
   if (encontradas.length > 0) {
-    resultadoDiv.className = "caixa-resposta alerta-perigo";
-    resultadoDiv.innerHTML = `
-      <h3>⚠️ ATENÇÃO: ESTA MENSAGEM PODE SER UM GOLPE!</h3>
-      <p><strong>Termos suspeitos identificados:</strong> ${encontradas.join(', ')}.</p>
+    painel.className = "resultado-analise alerta-perigo";
+    painel.innerHTML = `
+      <h3>⚠️ ATENÇÃO: POSSÍVEL GOLPE DETECTADO!</h3>
+      <p>Termos de risco identificados: <strong>${encontradas.join(', ')}</strong></p>
       <br>
-      <p>💡 <strong>Dicas de proteção:</strong></p>
-      <ul>
-        <li>Não faça PIX nem envie dinheiro.</li>
-        <li>Não clique em links.</li>
-        <li>Ligue para o parente ou banco no número antigo/oficial.</li>
-      </ul>
+      <p><strong>Orientação:</strong> Não faça pagamentos nem envie dados. Ligue diretamente para a pessoa ou instituição para confirmar.</p>
     `;
   } else {
-    resultadoDiv.className = "caixa-resposta alerta-seguro";
-    resultadoDiv.innerHTML = `
-      <h3>✅ Nenhum termo suspeito comum foi encontrado.</h3>
-      <p>Mesmo assim, lembre-se: bancos e parentes não pedem senhas ou códigos por mensagem!</p>
+    painel.className = "resultado-analise alerta-seguro";
+    painel.innerHTML = `
+      <h3>✅ Nenhum termo suspeito evidente foi encontrado.</h3>
+      <p>Mantenha a atenção: nunca compartilhe senhas ou códigos recebidos por SMS.</p>
     `;
   }
+}
+
+// SISTEMA DE SIMULAÇÃO GMAIL
+function abrirModalGmail() {
+  document.getElementById('modalGmail').classList.remove('hidden');
+}
+
+function fecharModalGmail() {
+  document.getElementById('modalGmail').classList.add('hidden');
+}
+
+function salvarGmail() {
+  const email = document.getElementById('inputEmail').value.trim();
+  if (email !== "" && email.includes('@')) {
+    document.querySelector('.btn-gmail').classList.add('hidden');
+    const usuarioDiv = document.getElementById('usuarioLogado');
+    document.getElementById('emailExibido').textContent = `👤 ${email}`;
+    usuarioDiv.classList.remove('hidden');
+    fecharModalGmail();
+  } else {
+    alert("Digite um e-mail válido.");
+  }
+}
+
+function deslogarGmail() {
+  document.querySelector('.btn-gmail').classList.remove('hidden');
+  document.getElementById('usuarioLogado').classList.add('hidden');
+  document.getElementById('inputEmail').value = "";
 }

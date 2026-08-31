@@ -3,104 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assistente Amigo - Acessibilidade e Segurança</title>
+  <title>Portal da Leitura & Segurança</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header class="cabecalho">
-    <h1>👓 Assistente Amigo</h1>
-    <p>Seu espaço seguro para ler com facilidade e evitar golpes.</p>
+  <!-- BARRA SUPERIOR ESTILO GOOGLE -->
+  <header class="barra-topo">
+    <div class="logo">
+      <span class="g-azul">A</span><span class="g-vermelho">m</span><span class="g-amarelo">i</span><span class="g-azul">g</span><span class="g-verde">o</span>
+    </div>
+    
+    <!-- ÁREA DO GMAIL -->
+    <div class="area-usuario">
+      <button class="btn-gmail" onclick="abrirModalGmail()">📧 Entrar com Gmail</button>
+      <div id="usuarioLogado" class="usuario-logado hidden">
+        <span id="emailExibido"></span>
+        <button class="btn-sair" onclick="deslogarGmail()">Sair</button>
+      </div>
+    </div>
   </header>
 
-  <!-- NAVEGAÇÃO POR ABAS -->
-  <nav class="navegacao-abas" aria-label="Navegação principal">
-    <button class="aba-btn ativa" onclick="abrirAba(event, 'aba-lupa')">🔍 Lupa de Leitura</button>
-    <button class="aba-btn" onclick="abrirAba(event, 'aba-verificador')">🛡️ Verificador</button>
-    <button class="aba-btn" onclick="abrirAba(event, 'aba-golpes')">📚 Como Funcionam os Golpes</button>
+  <!-- NAVEGAÇÃO PRINCIPAL -->
+  <nav class="menu-navegacao">
+    <button class="tab-btn ativa" onclick="mudarAba(event, 'aba-lupa')">🔍 Lupa & Leitura por Voz</button>
+    <button class="tab-btn" onclick="mudarAba(event, 'aba-verificador')">🛡️ Verificador Antigolpe</button>
+    <button class="tab-btn" onclick="mudarAba(event, 'aba-guias')">📚 Guia de Segurança</button>
   </nav>
 
   <main class="conteudo-principal">
 
-    <!-- ABA 1: LUPA DE LEITURA -->
+    <!-- ABA 1: LUPA E VOZ -->
     <section id="aba-lupa" class="aba-conteudo ativa">
-      <div class="cartao">
-        <h2>🔍 Lupa de Leitura Interativa</h2>
-        <label for="textoLupa">Cole ou digite seu texto abaixo:</label>
-        <textarea id="textoLupa" rows="4" placeholder="Cole a mensagem ou texto aqui..."></textarea>
+      <div class="caixa-busca">
+        <h2>🔍 Lupa e Leitor por Voz</h2>
+        <p class="subtitulo">Digite ou cole qualquer texto para ampliar e ouvir com facilidade.</p>
         
-        <div class="controles-lupa">
-          <button type="button" class="btn-controle" onclick="ampliarTexto()">➕ Aumentar Letra</button>
-          <button type="button" class="btn-controle btn-secundario" onclick="restaurarTexto()">🔄 Tamanho Normal</button>
+        <textarea id="textoEntrada" rows="4" placeholder="Cole seu texto ou mensagem aqui..."></textarea>
+        
+        <div class="painel-controles">
+          <button type="button" class="btn-acao btn-amarelo" onclick="alterarTamanho(4)">➕ Aumentar Letra</button>
+          <button type="button" class="btn-acao btn-cinza" onclick="alterarTamanho(-4)">➖ Diminuir Letra</button>
+          <button type="button" class="btn-acao btn-azul" onclick="ouvirTexto()">🔊 Ouvir Texto</button>
+          <button type="button" class="btn-acao btn-vermelho" onclick="pararVoz()">⏹️ Parar Voz</button>
         </div>
 
-        <div class="caixa-resposta">
-          <h3>Resultado da Leitura:</h3>
-          <div id="resultadoLupa" class="texto-ampliado">O texto ampliado aparecerá aqui.</div>
+        <div class="caixa-exibicao">
+          <label>Resultado Ampliado:</label>
+          <div id="textoAmpliado" class="display-texto">O seu texto aparecerá aqui...</div>
         </div>
       </div>
     </section>
 
-    <!-- ABA 2: VERIFICADOR DE MENSAGENS -->
+    <!-- ABA 2: VERIFICADOR ANTIGOLPE -->
     <section id="aba-verificador" class="aba-conteudo">
-      <div class="cartao">
-        <h2>🛡️ Verificador de Mensagens Suspeitas</h2>
-        <label for="textoGolpe">Recebeu uma mensagem estranha? Cole aqui:</label>
-        <textarea id="textoGolpe" rows="4" placeholder="Exemplo: Preciso de um PIX urgente..."></textarea>
-        
-        <button type="button" onclick="verificarGolpe()" class="botao-acao">ANALISAR MENSAGEM</button>
+      <div class="caixa-busca">
+        <h2>🛡️ Analisador de Mensagens Suspeitas</h2>
+        <p class="subtitulo">Cole mensagens do WhatsApp ou SMS para verificar o risco de fraude.</p>
 
-        <div id="resultadoGolpe" class="caixa-resposta hidden" aria-live="polite"></div>
+        <textarea id="textoAnalisar" rows="4" placeholder="Exemplo: Mãe, mudei de número, me faz um PIX urgente..."></textarea>
+
+        <button type="button" class="btn-busca-principal" onclick="analisarGolpe()">🔍 VERIFICAR MENSAGEM</button>
+
+        <div id="painelResultado" class="resultado-analise hidden"></div>
       </div>
     </section>
 
-    <!-- ABA 3: EDUCATIVA SOBRE GOLPES -->
-    <section id="aba-golpes" class="aba-conteudo">
-      <div class="cartao">
-        <h2>📚 Guia de Prevenção Contra Golpes</h2>
-        <p class="instrucao-aba">Escolha um tipo de golpe abaixo para entender como ele funciona:</p>
+    <!-- ABA 3: GUIAS E INFORMAÇÕES -->
+    <section id="aba-guias" class="aba-conteudo">
+      <div class="caixa-busca">
+        <h2>📚 Guia Completo de Prevenção</h2>
+        
+        <div class="grid-informacoes">
+          <!-- CARD WHATSAPP -->
+          <article class="card-info">
+            <h3>📱 Golpes no WhatsApp</h3>
+            <ul>
+              <li><strong>Falso Parente:</strong> Usam foto de um familiar com número novo pedindo dinheiro urgente. Ligue no número antigo antes de pagar.</li>
+              <li><strong>Código SMS:</strong> Nunca passe códigos de 6 dígitos que chegaram no seu celular. Eles servem para roubar sua conta.</li>
+              <li><strong>Links Falsos:</strong> Promessas de prêmios ou recadastramento de conta costumam ser roubo de dados.</li>
+            </ul>
+          </article>
 
-        <div class="sub-navegacao">
-          <button class="sub-aba-btn ativa" onclick="abrirSubAba(event, 'golpe-whatsapp')">📱 Golpes pelo WhatsApp</button>
-          <button class="sub-aba-btn" onclick="abrirSubAba(event, 'golpe-ligacao')">📞 Golpes por Ligação</button>
+          <!-- CARD LIGAÇÕES -->
+          <article class="card-info">
+            <h3>📞 Golpes por Ligação</h3>
+            <ul>
+              <li><strong>Falsa Central Bancária:</strong> Dizem que houve uma compra suspeita e pedem senhas. Desligue e ligue no número atrás do seu cartão.</li>
+              <li><strong>Motoboy do Banco:</strong> Nenhum banco manda buscar seu cartão em casa, mesmo se estiver cortado ao meio.</li>
+              <li><strong>Falso Sequestro:</strong> Se ligarem chorando pedindo resgate, desligue e confirme a segurança do seu familiar.</li>
+            </ul>
+          </article>
         </div>
-
-        <!-- SUB-ABA WHATSAPP -->
-        <article id="golpe-whatsapp" class="sub-aba-conteudo ativa">
-          <h3>📱 Como ocorrem os golpes pelo WhatsApp:</h3>
-          <ul class="lista-explicativa">
-            <li>
-              <strong>Falso Parente:</strong> O criminoso usa a foto de um parente (filho, neto) com um número novo e diz que mudou de telefone. Em seguida, pede dinheiro urgente para pagar uma conta ou fazer um PIX.
-            </li>
-            <li>
-              <strong>Código de Confirmação:</strong> Alguém liga ou manda mensagem fingindo ser de um site de vendas, hotel ou órgão público e pede para você falar um "código de 6 dígitos" enviado por SMS. Esse código serve para roubar o seu WhatsApp.
-            </li>
-            <li>
-              <strong>Links Falsos:</strong> Mensagens prometendo prêmios, cestas básicas, recadastramento de banco ou promoções. Ao clicar no link, eles tentam roubar suas senhas.
-            </li>
-          </ul>
-        </article>
-
-        <!-- SUB-ABA LIGAÇÃO -->
-        <article id="golpe-ligacao" class="sub-aba-conteudo">
-          <h3>📞 Como ocorrem os golpes por Ligação Telefônica:</h3>
-          <ul class="lista-explicativa">
-            <li>
-              <strong>Falsa Central do Banco:</strong> Uma pessoa liga dizendo ser do seu banco e afirma que houve uma compra suspeita no seu cartão. Ela pede para você confirmar senhas, digitar dados ou fazer transferências para "cancelar" a transação.
-            </li>
-            <li>
-              <strong>Golpe do Falso Sequestro:</strong> O golpista liga chorando ou gritando, fingindo ser um familiar em perigo, e exige dinheiro imediato para liberar a pessoa.
-            </li>
-            <li>
-              <strong>Motoboy do Banco:</strong> A pessoa liga dizendo que seu cartão foi clonado e informa que um "entregador" vai até sua casa buscar o cartão cortado. Mesmo cortado, o chip continua funcionando para dar golpes.
-            </li>
-          </ul>
-        </article>
-
       </div>
     </section>
 
   </main>
+
+  <!-- MODAL DO GMAIL -->
+  <div id="modalGmail" class="modal hidden">
+    <div class="conteudo-modal">
+      <span class="fechar" onclick="fecharModalGmail()">&times;</span>
+      <h2>📧 Conectar Gmail</h2>
+      <p>Digite seu e-mail para personalizar sua experiência:</p>
+      <input type="email" id="inputEmail" placeholder="seuemail@gmail.com">
+      <button class="btn-busca-principal" onclick="salvarGmail()">Salvar e Conectar</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
